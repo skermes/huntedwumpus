@@ -1,4 +1,4 @@
-import random
+import random, sys
 
 def new_cavern(pits=2,bats=2):
     ''' Creates a new cave, based on the diagram
@@ -65,19 +65,33 @@ def new_hunter(cavern):
     caves -= set(cavern['pits'])
     caves -= set([cavern['wumpus']])
     cavern['hunter'] = random.choice(list(caves))
+    
+    print 'You hear noise near the mouth of the cavern.'
     return cavern
     
 def move_hunter(cavern):
-    destination = random.choice(cavern['caves'][cavern['hunter']])
-    
-    if destination in cavern['pits']:
-        print 'In the distance, you hear a cry as something tumbles into one of the cavern\'s bottomless pits.'
-        cavern = new_hunter(cavern)
-    elif destination in cavern['bats']:
-        print 'An animal yelling somewhere in the caverns tells you that the superbats have captured something.'
-        cavern = new_hunter(cavern)
-    elif destination == cavern['wumpus']:
-        print 'Suddenly, a strange creature holding some pointed sticks enters your cave!' # HUNTER ACTION
+    if cavern['wumpus'] in cavern['caves'][cavern['hunter']] and random.random() < .2:
+        target = random.choice(cavern['caves'][cavern['hunter']])
+        if target == cavern['wumpus']:
+            print 'Out of nowhere, you feel something pierce your side.  As you lose consciousness, you see a strange creature run into the cave.  It looks happy.'
+            sys.exit()
+        elif random.random() < .4:
+            print 'You hear a scream somewhere in cavern.'
+            cavern = new_hunter(cavern)        
+        else:
+            print 'You hear an odd noise in the distance, like an animal throwing sticks around, though you can\'t imagine for what purpose.'
+    else:
+        destination = random.choice(cavern['caves'][cavern['hunter']])
+        cavern['hunter'] = destination
+        
+        if destination in cavern['pits']:
+            print 'In the distance, you hear a cry as something tumbles into one of the cavern\'s bottomless pits.'
+            cavern = new_hunter(cavern)
+        elif destination in cavern['bats']:
+            print 'An animal yelling somewhere in the caverns tells you that the superbats have captured something.'
+            cavern = new_hunter(cavern)
+        elif destination == cavern['wumpus']:        
+            print 'Suddenly, a strange creature holding some pointed sticks enters your cave!' # HUNTER ACTION
         
     return cavern
     
