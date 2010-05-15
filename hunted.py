@@ -19,9 +19,12 @@ def new_cavern(pits=2,bats=2):
              'bats': caves[:bats],
              'pits': caves[bats:pits+bats],
              'wumpus': caves[pits+bats],
-             'hunter': caves[pits+bats+1] }
+             'hunter': caves[pits+bats+1],
+             'sleep': 0 }
+             
 
-def tell(cavern):
+
+def look(cavern):
     ''' Prints some information about the player's 
         current position in the cavern. '''
     print 'You are in room', cavern['wumpus'], 'of the cavern.'    
@@ -106,6 +109,10 @@ def do(action, cavern):
         destination = int(action[1:])
         cavern = move_to(destination, cavern)
         return move_hunter(cavern)
+    elif action.startswith('s'):
+        for turn in xrange(int(action[1:])):
+            cavern = move_hunter(cavern)
+        return cavern
     elif action == 'debug':
         print cavern
         return cavern
@@ -116,7 +123,7 @@ def do(action, cavern):
 def begin():
     ''' Starts a new game. '''
     cavern = new_cavern()    
-    tell(cavern)    
+    look(cavern)    
     return cavern
              
 if __name__ == '__main__':
@@ -125,5 +132,5 @@ if __name__ == '__main__':
         action = prompt()
         print
         cavern = do(action, cavern)
-        tell(cavern)
+        look(cavern)
         print 
