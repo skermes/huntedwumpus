@@ -1,1 +1,55 @@
- 
+import random
+
+def new_cavern(pits=2,bats=2):
+    ''' Creates a new cave, based on the diagram
+        for the original hunt the wumpus game:
+        http://www.atariarchives.org/bcc1/showpage.php?page=247 '''
+    assert pits + bats < 18
+        
+    caves = range(19)
+    random.shuffle(caves)
+        
+    return { 'caves': [(1,2,8), (0,4,13), (0,3,5),
+                       (2,4,6), (1,3,7), (2,9,10),
+                       (3,10,11), (4,11,12), (0,9,19),
+                       (5,8,14), (5,6,15), (6,7,16),
+                       (7,13,17), (1,12,19), (9,15,18),
+                       (10,16,14), (11,15,17), (12,16,18),
+                       (14,17,19), (8,13,18)],
+             'bats': caves[:bats],
+             'pits': caves[bats:pits+bats],
+             'wumpus': caves[pits+bats],
+             'hunter': caves[pits+bats+1] }
+
+def tell(cavern):
+    ''' Prints some information about the player's 
+        current position in the cavern. '''
+    print 'You are in room', cavern['wumpus'], 'of the cavern.'    
+    neighborhood = cavern['caves'][cavern['wumpus']]
+    
+    bats, pit = False, False
+    for cave in neighborhood:
+        if cave in cavern['bats'] and not bats:
+            print 'You hear the rustling of leathery wings in the distance.'
+            bats = True
+        elif cave in cavern['pits'] and not pit:
+            print 'You feel a draft from one of the nearby caves.'
+            pit = True
+        elif cave == cavern['hunter']:
+            print 'You smell an unfamiliar creature.'
+        
+    print 'There are tunnels to caves', neighborhood[0], ',', neighborhood[1], ', and', neighborhood[2], '.'
+             
+def prompt():
+    ''' Asks the player for the next action. '''
+    return raw_input('Move or sleep? (m-s)')
+             
+def begin():
+    ''' Starts a new game. '''
+    cavern = new_cavern()    
+    tell(cavern)    
+    return cavern
+             
+if __name__ == '__main__':
+    cavern = begin()
+    print cavern
