@@ -99,12 +99,13 @@ def do(action, cavern):
     if action.startswith('m'):
         destination = int(action[1:])
         cavern = move_to(destination, cavern)
+        return move_hunter(cavern)
     elif action == 'debug':
         print cavern
+        return cavern
     else:
-        print 'You aren\'t sure what you just tried to do, but you are sure that you\'d rather not repeat the experiment.'
-        
-    return move_hunter(cavern)
+        print 'You aren\'t sure what you just tried to do, but you are sure that you\'d rather not repeat the experiment.'    
+        return cavern
              
 def begin():
     ''' Starts a new game. '''
