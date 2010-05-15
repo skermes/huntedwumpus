@@ -44,6 +44,10 @@ def prompt():
     ''' Asks the player for the next action. '''
     return raw_input('Move or sleep? (m-s) ')
 
+def meet_hunter(cavern):
+    print 'You are frightened and confused by this hairless beast.  It yells and you lash out with one great paw.  The creature stops yelling, and doesn\'t get up from the floor.'
+    return new_hunter(cavern)
+    
 def move_to(destination, cavern):
     if destination not in cavern['caves'][cavern['wumpus']]:
         print 'What looked like a tunnel to cave', destination, 'was just an odd rock formation.  You can\'t get there from here.'
@@ -55,7 +59,8 @@ def move_to(destination, cavern):
     elif destination in cavern['bats']:
         print 'The air in this cave is filled with a swarm of giant bats.  They grab at you, but are unable to lift your bulk off the floor.'
     elif destination == cavern['hunter']:
-        print 'You come face to face with a strange creature holding some pointed sticks.' # HUNTER ACTION
+        print 'You come face to face with a strange creature holding some pointed sticks.'
+        cavern = meet_hunter(cavern)
     
     return cavern
     
@@ -91,7 +96,8 @@ def move_hunter(cavern):
             print 'An animal yelling somewhere in the caverns tells you that the superbats have captured something.'
             cavern = new_hunter(cavern)
         elif destination == cavern['wumpus']:        
-            print 'Suddenly, a strange creature holding some pointed sticks enters your cave!' # HUNTER ACTION
+            print 'Suddenly, a strange creature holding some pointed sticks enters your cave!'
+            cavern = meet_hunter(cavern)
         
     return cavern
     
