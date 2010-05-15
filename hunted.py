@@ -30,7 +30,7 @@ def tell(cavern):
     bats, pit = False, False
     for cave in neighborhood:
         if cave in cavern['bats'] and not bats:
-            print 'You hear the rustling of leathery wings in the distance.'
+            print 'You hear the rustling of leathery wings.'
             bats = True
         elif cave in cavern['pits'] and not pit:
             print 'You feel a draft from one of the nearby caves.'
@@ -59,12 +59,36 @@ def move_to(destination, cavern):
     
     return cavern
     
+def new_hunter(cavern):
+    caves = set(range(19))
+    caves -= set(cavern['bats'])
+    caves -= set(cavern['pits'])
+    caves -= set([cavern['wumpus']])
+    cavern['hunter'] = random.choice(list(caves))
+    return cavern
+    
+def move_hunter(cavern):
+    destination = random.choice(cavern['caves'][cavern['hunter']])
+    
+    if destination in cavern['pits']:
+        print 'In the distance, you hear a cry as something tumbles into one of the cavern\'s bottomless pits.'
+        cavern = new_hunter(cavern)
+    elif destination in cavern['bats']:
+        print 'An animal yelling somewhere in the caverns tells you that the superbats have captured something.'
+        cavern = new_hunter(cavern)
+    elif destination == cavern['wumpus']:
+        print 'Suddenly, a strange creature holding some pointed sticks enters your cave!' # HUNTER ACTION
+        
+    return cavern
+    
 def do(action, cavern):
     if action.startswith('m'):
         destination = int(action[1:])
-        return move_to(destination, cavern)
+        cavern = move_to(destination, cavern)
     else:
         print 'You aren\'t sure what you just tried to do, but you are sure that you\'d rather not repeat the experiment.'
+        
+    return move_hunter(cavern)
              
 def begin():
     ''' Starts a new game. '''
