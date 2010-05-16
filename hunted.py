@@ -157,6 +157,8 @@ def do(action, cavern):
     elif action.startswith('s'):
         cavern = sleep(cavern, int(action[1:]))
         return cavern
+    elif action == 'exit':
+        sys.exit()
     elif action == 'debug':
         tell(cavern, cavern)      
         return cavern
