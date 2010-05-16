@@ -1,7 +1,7 @@
 import random, sys
 
-__debugging = True
-__show_score = True
+__debugging = False
+__show_score = False
 
 def new_cavern(pits=2,bats=2):
     ''' Creates a new cave, based on the diagram
@@ -207,6 +207,12 @@ def end(cavern):
     sys.exit()
              
 if __name__ == '__main__':
+    if '--debug' in sys.argv:
+        __debugging = True
+        
+    if '--score' in sys.argv:
+        __show_score = True
+
     cavern = begin()
     while True:        
         action, arg = prompt()
