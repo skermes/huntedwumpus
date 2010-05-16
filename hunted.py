@@ -26,14 +26,15 @@ def new_cavern(pits=2,bats=2):
              'sleep': 0,
              'stats': { 'moves': 0,
                         'sleeps': 0,
-                        'hunters': 0 }}
+                        'hunters': 0 },
+             'output': sys.stdout }
              
 def tell(cavern, *comments):
     ''' Works pretty much like a regular print call except that it won't write
         anything if the player is sleeping. '''
     if cavern['sleep'] < 1:
-        sys.stdout.write(' '.join(str(c) for c in comments))
-        sys.stdout.write('\n')
+        cavern['output'].write(' '.join(str(c) for c in comments))
+        cavern['output'].write('\n')
 
 def look(cavern):
     ''' Prints some information about the player's 
