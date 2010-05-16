@@ -25,6 +25,8 @@ def new_cavern(pits=2,bats=2):
              'sleep': 0 }
              
 def tell(cavern, *comments):
+    ''' Works pretty much like a regular print call except that it won't write
+        anything if the player is sleeping. '''
     if cavern['sleep'] < 1:
         sys.stdout.write(' '.join(str(c) for c in comments))
         sys.stdout.write('\n')
@@ -53,10 +55,12 @@ def prompt():
     return raw_input('Move or sleep? (m-s) ')
 
 def meet_hunter(cavern):
+    ''' The wumpus meets the hunter!  What will happen? (hint: someone might get eated.) '''
     tell(cavern, 'You are frightened and confused by this hairless beast.  It yells and you lash out with one great paw.  The creature stops yelling, and doesn\'t get up from the floor.')
     return new_hunter(cavern)
     
 def move_to(destination, cavern):
+    ''' Moves the wumpus to the specified cave in the cavern, reporting the cave's state on the way. '''
     if destination not in cavern['caves'][cavern['wumpus']]:
         tell(cavern, 'What looked like a tunnel to cave', destination, 'was just an odd rock formation.  You can\'t get there from here.')
         return cavern
@@ -73,6 +77,7 @@ def move_to(destination, cavern):
     return cavern
     
 def new_hunter(cavern):
+    ''' Spawns a new hunter in the cavern, replacing the old one. '''
     caves = set(range(19))
     caves -= set(cavern['bats'])
     caves -= set(cavern['pits'])
@@ -83,6 +88,8 @@ def new_hunter(cavern):
     return cavern
     
 def move_hunter(cavern):
+    ''' Moves the hunter around the cavern, or has the hunter
+        shoot an arrow if it's near the wumpus.  '''
     if cavern['wumpus'] in cavern['caves'][cavern['hunter']]:
         target = random.choice(cavern['caves'][cavern['hunter']])
         if target == cavern['wumpus']:
@@ -112,6 +119,8 @@ def move_hunter(cavern):
     return cavern
     
 def sleep(cavern, turns):
+    ''' Makes the wumpus sleep for turns. The hunter keeps moving while
+        the wumpus sleeps. '''
     cavern['sleep'] = turns
     while cavern['sleep'] > 0:
         cavern = move_hunter(cavern)
@@ -119,6 +128,8 @@ def sleep(cavern, turns):
     return cavern
     
 def be_tired(cavern):
+    ''' Informs the player that they are tired.  Players that are
+        tired may fall asleep. '''        
     if cavern['sleep'] >= 0:
         pass
     elif -2 <= cavern['sleep'] <= -1:
@@ -146,6 +157,7 @@ def be_tired(cavern):
     return cavern, fell_asleep
     
 def do(action, cavern):        
+    ''' Does an action in the cavern.  Currently, actions are moving, sleeping, debugging and exiting. '''
     if action.startswith('m'):
         cavern, fell_asleep = be_tired(cavern)
         if fell_asleep:
