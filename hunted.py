@@ -52,7 +52,13 @@ def look(cavern):
              
 def prompt():
     ''' Asks the player for the next action. '''
-    return raw_input('Move or sleep? (m-s) ')
+    action = raw_input('Move or sleep? (m-s) ')
+    if action == 'm':
+        return action, int(raw_input('Where to? '))
+    elif action == 's':
+        return action, int(raw_input('How long? '))
+    
+    return action, None
 
 def meet_hunter(cavern):
     ''' The wumpus meets the hunter!  What will happen? (hint: someone might get eated.) '''
@@ -156,19 +162,18 @@ def be_tired(cavern):
     
     return cavern, fell_asleep
     
-def do(action, cavern):        
+def do(action, argument, cavern):        
     ''' Does an action in the cavern.  Currently, actions are moving, sleeping, debugging and exiting. '''
-    if action.startswith('m'):
+    if action == 'm':
         cavern, fell_asleep = be_tired(cavern)
         if fell_asleep:
             tell(cavern, 'Unable to remain awake, you collapse where you are and fall asleep.')
             sleep(cavern, random.randint(-2,2) + cavern['sleep'])
-        else:
-            destination = int(action[1:])
-            cavern = move_to(destination, cavern)
+        else:            
+            cavern = move_to(argument, cavern)
         return move_hunter(cavern)
-    elif action.startswith('s'):
-        cavern = sleep(cavern, int(action[1:]))
+    elif action == 's':
+        cavern = sleep(cavern, argument)
         return cavern
     elif action == 'exit':
         sys.exit()
@@ -188,8 +193,8 @@ def begin():
 if __name__ == '__main__':
     cavern = begin()
     while True:        
-        action = prompt()
+        action, arg = prompt()
         tell(cavern, '')
-        cavern = do(action, cavern)
+        cavern = do(action, arg, cavern)
         look(cavern)
         tell(cavern, '')
