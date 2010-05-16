@@ -22,47 +22,51 @@ def new_cavern(pits=2,bats=2):
              'hunter': caves[pits+bats+1],
              'sleep': 0 }
              
-
+def tell(cavern, *comments):
+    if cavern['sleep'] < 1:
+        for c in comments:
+            print c,
+        print
 
 def look(cavern):
     ''' Prints some information about the player's 
         current position in the cavern. '''
-    print 'You are in room', cavern['wumpus'], 'of the cavern.'    
+    tell(cavern, 'You are in room', cavern['wumpus'], 'of the cavern.')
     neighborhood = cavern['caves'][cavern['wumpus']]
     
     bats, pit = False, False
     for cave in neighborhood:
         if cave in cavern['bats'] and not bats:
-            print 'You hear the rustling of leathery wings.'
+            tell(cavern, 'You hear the rustling of leathery wings.')
             bats = True
         elif cave in cavern['pits'] and not pit:
-            print 'You feel a draft from one of the nearby caves.'
+            tell(cavern, 'You feel a draft from one of the nearby caves.')
             pit = True
         elif cave == cavern['hunter']:
-            print 'You smell an unfamiliar creature.'
+            tell(cavern, 'You smell an unfamiliar creature.')
         
-    print 'There are tunnels to caves', neighborhood[0], ',', neighborhood[1], ', and', neighborhood[2], '.'
+    tell(cavern, 'There are tunnels to caves', neighborhood[0], ',', neighborhood[1], ', and', neighborhood[2], '.')
              
 def prompt():
     ''' Asks the player for the next action. '''
     return raw_input('Move or sleep? (m-s) ')
 
 def meet_hunter(cavern):
-    print 'You are frightened and confused by this hairless beast.  It yells and you lash out with one great paw.  The creature stops yelling, and doesn\'t get up from the floor.'
+    tell(cavern, 'You are frightened and confused by this hairless beast.  It yells and you lash out with one great paw.  The creature stops yelling, and doesn\'t get up from the floor.')
     return new_hunter(cavern)
     
 def move_to(destination, cavern):
     if destination not in cavern['caves'][cavern['wumpus']]:
-        print 'What looked like a tunnel to cave', destination, 'was just an odd rock formation.  You can\'t get there from here.'
+        tell(cavern, 'What looked like a tunnel to cave', destination, 'was just an odd rock formation.  You can\'t get there from here.')
         return cavern
     
     cavern['wumpus'] = destination
     if destination in cavern['pits']:
-        print 'You stumble into one of the cavern\'s bottomless pits.  Fortunately you\'re no stranger to these hazards, and pull yourself up with ease.'
+        tell(cavern, 'You stumble into one of the cavern\'s bottomless pits.  Fortunately you\'re no stranger to these hazards, and pull yourself up with ease.')
     elif destination in cavern['bats']:
-        print 'The air in this cave is filled with a swarm of giant bats.  They grab at you, but are unable to lift your bulk off the floor.'
+        tell(cavern, 'The air in this cave is filled with a swarm of giant bats.  They grab at you, but are unable to lift your bulk off the floor.')
     elif destination == cavern['hunter']:
-        print 'You come face to face with a strange creature holding some pointed sticks.'
+        tell(cavern, 'You come face to face with a strange creature holding some pointed sticks.')
         cavern = meet_hunter(cavern)
     
     return cavern
@@ -74,32 +78,34 @@ def new_hunter(cavern):
     caves -= set([cavern['wumpus']])
     cavern['hunter'] = random.choice(list(caves))
     
-    print 'You hear noise near the mouth of the cavern.'
+    tell(cavern, 'You hear noise near the mouth of the cavern.')
     return cavern
     
 def move_hunter(cavern):
-    if cavern['wumpus'] in cavern['caves'][cavern['hunter']] and random.random() < .2:
+    if cavern['wumpus'] in cavern['caves'][cavern['hunter']]:
         target = random.choice(cavern['caves'][cavern['hunter']])
         if target == cavern['wumpus']:
-            print 'Out of nowhere, you feel something pierce your side.  As you lose consciousness, you see a strange creature run into the cave.  It looks happy.'
+            cavern['sleep'] = 0
+            tell(cavern, 'Out of nowhere, you feel something pierce your side.  As you lose consciousness, you see a strange creature run into the cave.  It looks happy.')
             sys.exit()
         elif random.random() < .4:
-            print 'You hear a scream somewhere in cavern.'
+            tell(cavern, 'You hear a scream somewhere in cavern.')
             cavern = new_hunter(cavern)        
         else:
-            print 'You hear an odd noise in the distance, like an animal throwing sticks around, though you can\'t imagine for what purpose.'
+            tell(cavern, 'You hear an odd noise in the distance, like an animal throwing sticks around, though you can\'t imagine for what purpose.')
     else:
         destination = random.choice(cavern['caves'][cavern['hunter']])
         cavern['hunter'] = destination
         
         if destination in cavern['pits']:
-            print 'In the distance, you hear a cry as something tumbles into one of the cavern\'s bottomless pits.'
+            tell(cavern, 'In the distance, you hear a cry as something tumbles into one of the cavern\'s bottomless pits.')
             cavern = new_hunter(cavern)
         elif destination in cavern['bats']:
-            print 'An animal yelling somewhere in the caverns tells you that the superbats have captured something.'
+            tell(cavern, 'An animal yelling somewhere in the caverns tells you that the superbats have captured something.')
             cavern = new_hunter(cavern)
-        elif destination == cavern['wumpus']:        
-            print 'Suddenly, a strange creature holding some pointed sticks enters your cave!'
+        elif destination == cavern['wumpus']:  
+            cavern['sleep'] = 0
+            tell(cavern, 'Suddenly, a strange creature holding some pointed sticks enters your cave!')
             cavern = meet_hunter(cavern)
         
     return cavern
@@ -110,14 +116,16 @@ def do(action, cavern):
         cavern = move_to(destination, cavern)
         return move_hunter(cavern)
     elif action.startswith('s'):
-        for turn in xrange(int(action[1:])):
+        cavern['sleep'] = int(action[1:])
+        while cavern['sleep'] > 0:
             cavern = move_hunter(cavern)
+            cavern['sleep'] -= 1
         return cavern
     elif action == 'debug':
-        print cavern
+        tell(cavern, cavern)      
         return cavern
     else:
-        print 'You aren\'t sure what you just tried to do, but you are sure that you\'d rather not repeat the experiment.'    
+        tell(cavern, 'You aren\'t sure what you just tried to do, but you are sure that you\'d rather not repeat the experiment.')
         return cavern
              
 def begin():
@@ -130,7 +138,7 @@ if __name__ == '__main__':
     cavern = begin()
     while True:        
         action = prompt()
-        print
+        tell(cavern, '')
         cavern = do(action, cavern)
         look(cavern)
-        print 
+        tell(cavern, '')
