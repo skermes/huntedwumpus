@@ -26,9 +26,8 @@ def new_cavern(pits=2,bats=2):
              
 def tell(cavern, *comments):
     if cavern['sleep'] < 1:
-        for c in comments:
-            print c,
-        print
+        sys.stdout.write(' '.join(str(c) for c in comments))
+        sys.stdout.write('\n')
 
 def look(cavern):
     ''' Prints some information about the player's 
