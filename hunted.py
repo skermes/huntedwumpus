@@ -48,7 +48,7 @@ def look(cavern):
         elif cave == cavern['hunter']:
             tell(cavern, 'You smell an unfamiliar creature.')
         
-    tell(cavern, 'There are tunnels to caves', neighborhood[0], ',', neighborhood[1], ', and', neighborhood[2], '.')
+    tell(cavern, 'There are tunnels to caves {0}, {1} and {2}.'.format(neighborhood[0], neighborhood[1], neighborhood[2]))
              
 def prompt():
     ''' Asks the player for the next action. '''
