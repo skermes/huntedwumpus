@@ -110,16 +110,52 @@ def move_hunter(cavern):
         
     return cavern
     
-def do(action, cavern):
+def sleep(cavern, turns):
+    cavern['sleep'] = turns
+    while cavern['sleep'] > 0:
+        cavern = move_hunter(cavern)
+        cavern['sleep'] -= 1
+    return cavern
+    
+def be_tired(cavern):
+    if cavern['sleep'] >= 0:
+        pass
+    elif -2 <= cavern['sleep'] <= -1:
+        tell(cavern, 'You are feeling drowsy.')
+    elif cavern['sleep'] == -3:
+        tell(cavern, 'You are feeling sleepy.')
+    elif cavern['sleep'] == -4:
+        tell(cavern, 'You would really like a nap.')
+    elif cavern['sleep'] == -5:
+        tell(cavern, 'The outcropping in the corner looks like a nice bed.')
+    elif cavern['sleep'] == -6:
+        tell(cavern, 'You catch yourself nodding off as you walk through the cavern.')
+    elif cavern['sleep'] == -7:
+        tell(cavern, 'It\'s becoming very difficult to keep yourself awake.')
+    elif cavern['sleep'] == -8:
+        tell(cavern, 'You\'ve never forced yourself to stay awake this long before.')
+    elif cavern['sleep'] == -9:
+        tell(cavern, 'As you drag yourself through the cavern, you know you can\'t stay awake much longer.')
+    elif cavern['sleep'] == -10:
+        tell(cavern, 'You hear voices coming from other caves, but in your exhaustion, you can\'t tell if they\'re real or not.')
+        
+    fell_asleep = random.random() < (-cavern['sleep'] * .1)
+    cavern['sleep'] -= 1
+    
+    return cavern, fell_asleep
+    
+def do(action, cavern):        
     if action.startswith('m'):
-        destination = int(action[1:])
-        cavern = move_to(destination, cavern)
+        cavern, fell_asleep = be_tired(cavern)
+        if fell_asleep:
+            tell(cavern, 'Unable to remain awake, you collapse where you are and fall asleep.')
+            sleep(cavern, random.randint(-2,2) + cavern['sleep'])
+        else:
+            destination = int(action[1:])
+            cavern = move_to(destination, cavern)
         return move_hunter(cavern)
     elif action.startswith('s'):
-        cavern['sleep'] = int(action[1:])
-        while cavern['sleep'] > 0:
-            cavern = move_hunter(cavern)
-            cavern['sleep'] -= 1
+        cavern = sleep(cavern, int(action[1:]))
         return cavern
     elif action == 'debug':
         tell(cavern, cavern)      
