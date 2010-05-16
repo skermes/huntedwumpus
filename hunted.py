@@ -1,6 +1,7 @@
 import random, sys
 
 __debugging = True
+__show_score = True
 
 def new_cavern(pits=2,bats=2):
     ''' Creates a new cave, based on the diagram
@@ -22,7 +23,10 @@ def new_cavern(pits=2,bats=2):
              'pits': caves[bats:pits+bats],
              'wumpus': caves[pits+bats],
              'hunter': caves[pits+bats+1],
-             'sleep': 0 }
+             'sleep': 0,
+             'stats': { 'moves': 0,
+                        'sleeps': 0,
+                        'hunters': 0 }}
              
 def tell(cavern, *comments):
     ''' Works pretty much like a regular print call except that it won't write
@@ -63,6 +67,7 @@ def prompt():
 def meet_hunter(cavern):
     ''' The wumpus meets the hunter!  What will happen? (hint: someone might get eated.) '''
     tell(cavern, 'You are frightened and confused by this hairless beast.  It yells and you lash out with one great paw.  The creature stops yelling, and doesn\'t get up from the floor.')
+    cavern['stats']['hunters'] += 1
     return new_hunter(cavern)
     
 def move_to(destination, cavern):
@@ -70,8 +75,9 @@ def move_to(destination, cavern):
     if destination not in cavern['caves'][cavern['wumpus']]:
         tell(cavern, 'What looked like a tunnel to cave', destination, 'was just an odd rock formation.  You can\'t get there from here.')
         return cavern
-    
+        
     cavern['wumpus'] = destination
+    cavern['stats']['moves'] += 1
     if destination in cavern['pits']:
         tell(cavern, 'You stumble into one of the cavern\'s bottomless pits.  Fortunately you\'re no stranger to these hazards, and pull yourself up with ease.')
     elif destination in cavern['bats']:
@@ -101,7 +107,7 @@ def move_hunter(cavern):
         if target == cavern['wumpus']:
             cavern['sleep'] = 0
             tell(cavern, 'Out of nowhere, you feel something pierce your side.  As you lose consciousness, you see a strange creature run into the cave.  It looks happy.')
-            sys.exit()
+            end(cavern)
         elif random.random() < .4:
             tell(cavern, 'You hear a scream somewhere in cavern.')
             cavern = new_hunter(cavern)        
@@ -131,6 +137,7 @@ def sleep(cavern, turns):
     while cavern['sleep'] > 0:
         cavern = move_hunter(cavern)
         cavern['sleep'] -= 1
+        cavern['stats']['sleeps'] += 1
     return cavern
     
 def be_tired(cavern):
@@ -168,7 +175,7 @@ def do(action, argument, cavern):
         cavern, fell_asleep = be_tired(cavern)
         if fell_asleep:
             tell(cavern, 'Unable to remain awake, you collapse where you are and fall asleep.')
-            sleep(cavern, random.randint(-2,2) + cavern['sleep'])
+            sleep(cavern, max(1, random.randint(-2,2) + cavern['sleep']))
         else:            
             cavern = move_to(argument, cavern)
         return move_hunter(cavern)
@@ -176,7 +183,7 @@ def do(action, argument, cavern):
         cavern = sleep(cavern, argument)
         return cavern
     elif action == 'exit':
-        sys.exit()
+        end(cavern)
     elif action == 'debug' and __debugging:
         tell(cavern, cavern)      
         return cavern
@@ -189,6 +196,15 @@ def begin():
     cavern = new_cavern()    
     look(cavern)    
     return cavern
+    
+def end(cavern):
+    ''' Reports information about the end of the game, then quits the program. '''
+    if __show_score:
+        tell(cavern, 'You moved through', cavern['stats']['moves'], 'caves.')
+        tell(cavern, 'You slept for', cavern['stats']['sleeps'], 'turns.')
+        tell(cavern, 'You killed', cavern['stats']['hunters'], 'hunters.')
+        
+    sys.exit()
              
 if __name__ == '__main__':
     cavern = begin()
