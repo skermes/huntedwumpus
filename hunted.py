@@ -1,5 +1,7 @@
 import random, sys
 
+__debugging = True
+
 def new_cavern(pits=2,bats=2):
     ''' Creates a new cave, based on the diagram
         for the original hunt the wumpus game:
@@ -159,7 +161,7 @@ def do(action, cavern):
         return cavern
     elif action == 'exit':
         sys.exit()
-    elif action == 'debug':
+    elif action == 'debug' and __debugging:
         tell(cavern, cavern)      
         return cavern
     else:
