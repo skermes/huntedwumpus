@@ -192,9 +192,10 @@ def do(action, argument, cavern):
         tell(cavern, 'You aren\'t sure what you just tried to do, but you are sure that you\'d rather not repeat the experiment.')
         return cavern
              
-def begin():
+def begin(output=sys.stdout):
     ''' Starts a new game. '''
-    cavern = new_cavern()    
+    cavern = new_cavern()
+    cavern['output'] = output
     look(cavern)    
     return cavern
     

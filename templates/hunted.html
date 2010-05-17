@@ -1,0 +1,16 @@
+$def with (cavern)
+
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Hunted Wumpus</title>
+    </head>
+    <body>
+        $str(cavern['output'])
+        <form method="post" action="/wumpus">
+            <input id="cavern-holder" name="cavern" type="text" value="$cavern" />
+            <input id="action-input" name="action" class="user-input" type="text" />
+            <input id="argument-input" name="argument" class="user-input" type="text" />
+        </form>
+    </body>
+</html>

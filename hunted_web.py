@@ -5,14 +5,12 @@ urls = (
     '/wumpus', 'Wumpus'
 )
 app = web.application(urls, globals())
+render = web.template.frender('templates/hunted.html', globals={'str': str})
 
 class Wumpus:
     def GET(self):
-        cavern = hunted.begin()
-        builder = StringBuilder()
-        cavern['output'] = builder
-        hunted.look(cavern)
-        return str(builder)
+        cavern = hunted.begin(output=StringBuilder())        
+        return render(cavern)
         
 class StringBuilder:
     def __init__(self):
