@@ -5,7 +5,7 @@ urls = (
     '/wumpus', 'Wumpus'
 )
 app = web.application(urls, globals())
-render = web.template.frender('templates/hunted.html', globals={'str': str})
+render = web.template.frender('templates/hunted.html')
 
 class Wumpus:
     def GET(self):
