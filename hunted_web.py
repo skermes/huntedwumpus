@@ -25,6 +25,16 @@ class Wumpus:
         else:
             argument = data.argument
         
+        hunted.tell(cavern, '')        
+        hunted.tell(cavern, 'Move or sleep? (m-s)')
+        hunted.tell(cavern, action)
+        if action == 'm':
+            hunted.tell(cavern, 'Where to?')
+            hunted.tell(cavern, argument)
+        elif action == 's':
+            hunted.tell(cavern, 'How long?')            
+            hunted.tell(cavern, argument)        
+        
         hunted.tell(cavern, '')
         cavern = hunted.do(action, argument, cavern)
         hunted.look(cavern)
