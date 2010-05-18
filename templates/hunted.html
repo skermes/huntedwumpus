@@ -5,12 +5,16 @@ $def with (cavern)
     <head>
         <title>Hunted Wumpus</title>
         <link rel="stylesheet" type="text/css" href="static/hunted.css" />
+        <script type="text/javascript" src="http://code.jquery.com/jquery-1.4.2.min.js"></script>
+        <script type="text/javascript" src="static/hunted.js"></script>
     </head>
     <body>
         $cavern['output']
         <form method="post" action="/wumpus">
             <input id="cavern-holder" name="cavern" type="text" value="$cavern" />
+            <label for="action-input">Move or sleep? (m-s)<label>
             <input id="action-input" name="action" class="user-input" type="text" />
+            <label for="argument-input" />
             <input id="argument-input" name="argument" class="user-input" type="text" />
             <input type="submit" />
         </form>
