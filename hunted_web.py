@@ -36,12 +36,17 @@ class Wumpus:
             hunted.tell(cavern, argument)        
         
         hunted.tell(cavern, '')
-        cavern = hunted.do(action, argument, cavern)
-        hunted.look(cavern)
-        hunted.tell(cavern, '')
+        cavern = hunted.do(action, argument, cavern)       
         
-        cavern['output'] = str(cavern['output'])
-        return render.hunted(cavern)
+        if not cavern['done']:
+            hunted.look(cavern)
+            hunted.tell(cavern, '')
+        
+        cavern['output'] = str(cavern['output'])        
+        if not cavern['done']:        
+            return render.hunted(cavern)
+        else:
+            return render.done(cavern)
         
 class StringBuilder:
     def __init__(self, initial=''):

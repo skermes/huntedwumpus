@@ -27,7 +27,8 @@ def new_cavern(pits=2,bats=2):
              'stats': { 'moves': 0,
                         'sleeps': 0,
                         'hunters': 0 },
-             'output': sys.stdout }
+             'output': sys.stdout,
+             'done': False }
              
 def tell(cavern, *comments):
     ''' Works pretty much like a regular print call except that it won't write
@@ -179,18 +180,17 @@ def do(action, argument, cavern):
             sleep(cavern, max(1, random.randint(-2,2) + cavern['sleep']))
         else:            
             cavern = move_to(argument, cavern)
-        return move_hunter(cavern)
+        cavern = move_hunter(cavern)
     elif action == 's':
-        cavern = sleep(cavern, argument)
-        return cavern
+        cavern = sleep(cavern, argument)        
     elif action == 'exit':
-        end(cavern)
+        cavern = end(cavern)
     elif action == 'debug' and __debugging:
-        tell(cavern, cavern)      
-        return cavern
+        tell(cavern, cavern)        
     else:
         tell(cavern, 'You aren\'t sure what you just tried to do, but you are sure that you\'d rather not repeat the experiment.')
-        return cavern
+        
+    return cavern
              
 def begin(output=sys.stdout):
     ''' Starts a new game. '''
@@ -206,7 +206,7 @@ def end(cavern):
         tell(cavern, 'You slept for', cavern['stats']['sleeps'], 'turns.')
         tell(cavern, 'You killed', cavern['stats']['hunters'], 'hunters.')
         
-    sys.exit()
+    cavern['done'] = True
              
 if __name__ == '__main__':
     if '--debug' in sys.argv:
@@ -220,5 +220,7 @@ if __name__ == '__main__':
         action, arg = prompt()
         tell(cavern, '')
         cavern = do(action, arg, cavern)
+        if cavern['done']:
+            sys.exit()
         look(cavern)
         tell(cavern, '')
