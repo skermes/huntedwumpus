@@ -12,6 +12,7 @@ function enterAction(e) {
             $("label[for='argument-input']").text("Where to?");
             
         $("#argument-input").focus();
+        $("#enter").unbind('click', enterAction);
     }    
 }
 
