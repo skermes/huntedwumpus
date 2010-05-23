@@ -39,11 +39,6 @@ that right now.'''.format(attr_name))
         
         return room
         
-    #def __getattr__(self, name):
-    #    for room_name in self.__stage.rooms:
-    #        if name == room_name.lower().replace(' ', '_'):
-    #            return Room(self.__stage, room_name)
-        
 class Room(object):    
     def __init__(self, stage, name):
         self.__stage = stage
