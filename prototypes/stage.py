@@ -1,58 +1,59 @@
 
-class Stage(object):    
+class StageState(object):
     def __init__(self):        
-        self.__rooms = { }
-        
-    def __new_room(self, name):
+        self.rooms = { }
+    
+    def new_room(self, name):
         r = { 'name': name,
               'exits': [],
               'description' : '' }
-        self.__rooms[name] = r
-        return r
+        self.rooms[name] = r
+        return r    
+
+class Stage(object):    
+    def __init__(self):
+        self.__stage = StageState()    
+        
+    def __room_name(self, name):
+        return name.lower().replace(' ', '_')
         
     def room(self, name):
-        if name not in self.__rooms:
-            r = self.__new_room(name)
+        if name not in self.__stage.rooms:
+            r = self.__stage.new_room(name)
         else:
-            r = self.__rooms[name]        
-            
-        return RoomStage(self, r)
+            r = self.__stage.rooms[name]        
+
+        room =  Room(self.__stage, r['name'])
+        self.__setattr__(self.__room_name(name), room)
+        return room
         
-class RoomStage(object):    
-    def __init__(self, stage, room):
+    #def __getattr__(self, name):
+    #    for room_name in self.__stage.rooms:
+    #        if name == room_name.lower().replace(' ', '_'):
+    #            return Room(self.__stage, room_name)
+        
+class Room(object):    
+    def __init__(self, stage, name):
         self.__stage = stage
-        self.__room = room
-    
-    def name(self):
-        return self.__room['name']
+        self.name = name
         
     def exits(self):
-        return self.__room['exits']
+        return tuple(self.__stage.rooms[self.name]['exits'])
         
     def connects_to(self, *room_names):
         for name in room_names:
-            
-            # This will make sure that the stage
-            # implicitly creates any rooms that
-            # are referenced here.
-            r = self.__stage.room(name)
+            if name not in self.__stage.rooms:
+                self.__stage.new_room(name)
                             
-            if name not in self.__room['exits']:
-                self.__room['exits'].append(name)
+            if name not in self.__stage.rooms[self.name]['exits']:
+                self.__stage.rooms[self.name]['exits'].append(name)
                 
-        return AlsoConnector(self)
+        return self
                 
     def looks_like(self, description=None):
         if description is None:
-            return self.__room['description']
+            return self.__stage.rooms[self.name]['description']
         else:
-            self.__room['description'] = description
-            return AlsoConnector(self)
-    
-class AlsoConnector(object):
-    def __init__(self, payload):
-        self.__payload = payload
-        
-    def also(self):
-        return self.__payload
+            self.__stage.rooms[self.name]['description'] = description
+            return self
         
