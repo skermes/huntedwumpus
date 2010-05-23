@@ -63,6 +63,13 @@ overstuffed chair with a mini fridge and launch codes for three countries' nucle
         self.stage.room('Flying Carpet').connects_to('Sky')
         self.__assertHasRoom('Flying Carpet', 'flying_carpet', exits=('Ground', 'Sky'))
         
+    def test_roomNameCollision(self):
+        self.stage.room('Grue Home')
+        self.assertRaises(ValueError, self.stage.room, 'gRUE hOME')
+        
+    def test_roomWithMethodName(self):
+        self.assertRaises(TypeError, self.stage.room, 'room')
+        
 def suite():
     return unittest.TestLoader().loadTestsFromTestCase(TestStage)
     

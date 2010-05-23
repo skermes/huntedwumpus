@@ -24,7 +24,19 @@ class Stage(object):
             r = self.__stage.rooms[name]        
 
         room =  Room(self.__stage, r['name'])
-        self.__setattr__(self.__room_name(name), room)
+        
+        attr_name = self.__room_name(name)
+        if not hasattr(self, attr_name):
+            self.__setattr__(attr_name, room)
+        elif not type(self.__getattribute__(attr_name)) == Room:
+            raise TypeError('''I'm sorry, but you tried to make an object \
+whose name resolves to '{0}', which is the name of a method that already \
+exists on Stages. '''.format(attr_name))
+        elif not self.__getattribute__(attr_name).name == name:
+            raise ValueError('''I'm sorry, but you tried to make two \
+objects that resolve to the same attribute name: '{0}'.  We don't support \
+that right now.'''.format(attr_name))
+        
         return room
         
     #def __getattr__(self, name):
