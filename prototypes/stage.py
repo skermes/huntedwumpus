@@ -1,5 +1,5 @@
 
-class StageState(object):
+class _StageState(object):
     def __init__(self):        
         self.rooms = { }
     
@@ -12,7 +12,7 @@ class StageState(object):
 
 class Stage(object):    
     def __init__(self):
-        self.__stage = StageState()    
+        self.__stage = _StageState()    
         
     def __room_name(self, name):
         return name.lower().replace(' ', '_')
