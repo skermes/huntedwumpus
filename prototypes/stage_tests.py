@@ -1,18 +1,19 @@
 import stage
 import unittest
+import json
 
 class TestStage(unittest.TestCase):    
     def setUp(self):
         self.stage = stage.Stage()
         
     def __assertHasRoom(self, name, attr, looks='', exits=()):
-        self.assertEqual(name, self.stage.room(name).name)
-        self.assertEqual(looks, self.stage.room(name).looks_like())
-        self.assertEqual(exits, self.stage.room(name).exits())
         self.assertTrue(hasattr(self.stage, attr))
         self.assertEqual(name, self.stage.__getattribute__(attr).name)
         self.assertEqual(looks, self.stage.__getattribute__(attr).looks_like())
         self.assertEqual(exits, self.stage.__getattribute__(attr).exits())
+        self.assertEqual(name, self.stage.room(name).name)
+        self.assertEqual(looks, self.stage.room(name).looks_like())
+        self.assertEqual(exits, self.stage.room(name).exits())        
         
     def test_createRoom(self):
         self.stage.room('Cave 1')
@@ -68,7 +69,25 @@ overstuffed chair with a mini fridge and launch codes for three countries' nucle
         self.assertRaises(ValueError, self.stage.room, 'gRUE hOME')
         
     def test_roomWithMethodName(self):
-        self.assertRaises(TypeError, self.stage.room, 'room')
+        self.assertRaises(ValueError, self.stage.room, 'room')
+        
+    def test_jsonExport(self):
+        self.stage.room('Pond').connects_to('Beaver Dam').looks_like('This is a pond.  What else do you want?')
+        self.stage.room('Beaver Dam').connects_to('Pond').looks_like('Beavers live here.')
+        data = { 'Pond': { 'name': 'Pond', 'exits' : ['Beaver Dam'], 
+                           'description': 'This is a pond.  What else do you want?' },
+                 'Beaver Dam': { 'name': 'Beaver Dam', 'exits' : ['Pond'],
+                                 'description': 'Beavers live here.' }}
+        self.assertEqual(json.dumps(data), self.stage.json())
+        
+    def test_jsonImport(self):
+        data = { 'Pond': { 'name': 'Pond', 'exits' : ['Beaver Dam'], 
+                           'description': 'This is a pond.  What else do you want?' },
+                 'Beaver Dam': { 'name': 'Beaver Dam', 'exits' : ['Pond'],
+                                 'description': 'Beavers live here.' }}
+        self.stage = stage.json(json.dumps(data))
+        self.__assertHasRoom('Pond', 'pond', exits=('Beaver Dam',), looks='This is a pond.  What else do you want?')
+        self.__assertHasRoom('Beaver Dam', 'beaver_dam', exits=('Pond',), looks='Beavers live here.')
         
 def suite():
     return unittest.TestLoader().loadTestsFromTestCase(TestStage)

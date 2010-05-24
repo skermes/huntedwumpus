@@ -1,3 +1,5 @@
+from json import loads as load_json
+from json import dumps as dump_json
 
 class _StageState(object):
     def __init__(self):        
@@ -11,33 +13,41 @@ class _StageState(object):
         return r    
 
 class Stage(object):    
-    def __init__(self):
-        self.__stage = _StageState()    
+    def __init__(self, state=None):
+        if state is None:
+            self.__stage = _StageState()    
+        else:
+            self.__stage = state
         
     def __room_name(self, name):
         return name.lower().replace(' ', '_')
         
     def room(self, name):
+        attr = self.__room_name(name)
+        if hasattr(self, attr) and (type(getattr(self, attr)) != Room or getattr(self, attr).name != name):
+            raise ValueError('''I'm sorrry, but the room you \
+just tried to create ('{0}') would create an implicit attribute \
+'{1}' on the stage.  The stage already has an attribute with that \
+name, so I really can't let you do that.'''.format(name, attr))
+        
         if name not in self.__stage.rooms:
             r = self.__stage.new_room(name)
         else:
             r = self.__stage.rooms[name]        
 
-        room =  Room(self.__stage, r['name'])
+        return Room(self.__stage, r['name'])
         
-        attr_name = self.__room_name(name)
-        if not hasattr(self, attr_name):
-            self.__setattr__(attr_name, room)
-        elif not type(self.__getattribute__(attr_name)) == Room:
-            raise TypeError('''I'm sorry, but you tried to make an object \
-whose name resolves to '{0}', which is the name of a method that already \
-exists on Stages. '''.format(attr_name))
-        elif not self.__getattribute__(attr_name).name == name:
-            raise ValueError('''I'm sorry, but you tried to make two \
-objects that resolve to the same attribute name: '{0}'.  We don't support \
-that right now.'''.format(attr_name))
+    def json(self):
+        return dump_json(self.__stage.rooms)
         
-        return room
+    def __getattribute__(self, name):
+        stage = object.__getattribute__(self, '_Stage__stage')
+        roomname = object.__getattribute__(self, '_Stage__room_name')
+        for room in stage.rooms:
+            if roomname(room) == name:
+                return Room(stage, stage.rooms[room]['name'])
+                
+        return object.__getattribute__(self, name)
         
 class Room(object):    
     def __init__(self, stage, name):
@@ -64,3 +74,8 @@ class Room(object):
             self.__stage.rooms[self.name]['description'] = description
             return self
         
+def json(input):
+    data = load_json(input)
+    state = _StageState()
+    state.rooms = data
+    return Stage(state)
